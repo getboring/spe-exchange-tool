@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Camera, Package, BarChart3, FileText, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ReloadPrompt } from '@/components/pwa/reload-prompt'
 
 const navItems = [
   { path: '/scan', icon: Camera, label: 'Scan' },
@@ -38,6 +39,9 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main content */}
       <main className="flex-1 overflow-auto p-4 pb-20">{children}</main>
+
+      {/* PWA update prompt */}
+      <ReloadPrompt />
 
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background">
