@@ -9,6 +9,7 @@ import { ScanPage } from '@/app/scan/page'
 import { InventoryPage } from '@/app/inventory/page'
 import { ItemDetailPage } from '@/app/inventory/[id]/page'
 import { DealsPage } from '@/app/deals/page'
+import { DealDetailPage } from '@/app/deals/[id]/page'
 import { AnalyticsPage } from '@/app/analytics/page'
 import { SettingsPage } from '@/app/settings/page'
 import { LoginPage } from '@/app/login/page'
@@ -51,7 +52,7 @@ function App() {
                   <Route path="/inventory" element={<InventoryPage />} />
                   <Route path="/inventory/:id" element={<ItemDetailPage />} />
                   <Route path="/deals" element={<DealsPage />} />
-                  <Route path="/deals/:id" element={<DealsPage />} />
+                  <Route path="/deals/:id" element={<DealDetailPage />} />
                   <Route path="/analytics" element={<AnalyticsPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Routes>
