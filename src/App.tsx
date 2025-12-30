@@ -3,10 +3,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore, initializeAuth } from '@/stores/auth-store'
 import { AppShell } from '@/components/layout/app-shell'
 
-// Page components (placeholder for now)
+// Page components
 import { DashboardPage } from '@/app/dashboard/page'
 import { ScanPage } from '@/app/scan/page'
 import { InventoryPage } from '@/app/inventory/page'
+import { ItemDetailPage } from '@/app/inventory/[id]/page'
 import { DealsPage } from '@/app/deals/page'
 import { AnalyticsPage } from '@/app/analytics/page'
 import { SettingsPage } from '@/app/settings/page'
@@ -48,7 +49,7 @@ function App() {
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/scan" element={<ScanPage />} />
                   <Route path="/inventory" element={<InventoryPage />} />
-                  <Route path="/inventory/:id" element={<InventoryPage />} />
+                  <Route path="/inventory/:id" element={<ItemDetailPage />} />
                   <Route path="/deals" element={<DealsPage />} />
                   <Route path="/deals/:id" element={<DealsPage />} />
                   <Route path="/analytics" element={<AnalyticsPage />} />
