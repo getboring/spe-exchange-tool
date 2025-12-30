@@ -79,7 +79,7 @@ export const useSettingsStore = create<SettingsState>()(
                 target_roi: state.targetRoi,
                 default_weight: state.defaultWeight,
                 default_sell_platform: state.defaultSellPlatform,
-              })
+              } as never)
               .eq('id', userId)
 
             if (error) throw error

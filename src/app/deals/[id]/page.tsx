@@ -251,7 +251,7 @@ export function DealDetailPage() {
                 </span>
                 <span
                   className={`font-medium ${
-                    (isCompleted ? deal.actual_profit : currentProfit) >= 0
+                    (isCompleted ? (deal.actual_profit || 0) : currentProfit) >= 0
                       ? 'text-green-600'
                       : 'text-red-600'
                   }`}

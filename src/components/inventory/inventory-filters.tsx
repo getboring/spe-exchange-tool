@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { useInventoryStore } from '@/stores/inventory-store'
 import { PLATFORMS, ITEM_STATUSES } from '@/lib/constants'
 

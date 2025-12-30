@@ -56,16 +56,17 @@ export function ItemDetailPage() {
       return
     }
 
-    setItem(data as Item)
+    const itemData = data as Item
+    setItem(itemData)
     setEditForm({
-      name: data.name,
-      platform: data.platform || '',
-      condition: data.condition || '',
-      type: data.type || 'game',
-      weight: data.weight || '8oz',
-      loose_price: data.loose_price ? toDollars(data.loose_price).toFixed(2) : '',
-      cib_price: data.cib_price ? toDollars(data.cib_price).toFixed(2) : '',
-      new_price: data.new_price ? toDollars(data.new_price).toFixed(2) : '',
+      name: itemData.name,
+      platform: itemData.platform || '',
+      condition: itemData.condition || '',
+      type: itemData.type || 'game',
+      weight: itemData.weight || '8oz',
+      loose_price: itemData.loose_price ? toDollars(itemData.loose_price).toFixed(2) : '',
+      cib_price: itemData.cib_price ? toDollars(itemData.cib_price).toFixed(2) : '',
+      new_price: itemData.new_price ? toDollars(itemData.new_price).toFixed(2) : '',
     })
     setLoading(false)
   }, [id])

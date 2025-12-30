@@ -76,8 +76,11 @@ export const useDealsStore = create<DealsState>()(
           .from('items')
           .select('deal_id, status')
 
-        const dealsWithCounts = (deals || []).map((deal) => {
-          const dealItems = items?.filter((i) => i.deal_id === deal.id) || []
+        const itemsData = (items as { deal_id: string | null; status: string }[]) || []
+        const dealsData = (deals as Deal[]) || []
+
+        const dealsWithCounts = dealsData.map((deal) => {
+          const dealItems = itemsData.filter((i) => i.deal_id === deal.id)
           return {
             ...deal,
             itemCount: dealItems.length,
@@ -107,11 +110,14 @@ export const useDealsStore = create<DealsState>()(
           .eq('deal_id', id)
           .order('created_at', { ascending: false })
 
+        const dealData = deal as Deal
+        const itemsData = (items as Item[]) || []
+
         return {
-          ...deal,
-          items: (items as Item[]) || [],
-          itemCount: items?.length || 0,
-          soldCount: items?.filter((i) => i.status === 'sold').length || 0,
+          ...dealData,
+          items: itemsData,
+          itemCount: itemsData.length,
+          soldCount: itemsData.filter((i) => i.status === 'sold').length,
         } as DealWithItems
       },
 
@@ -129,7 +135,7 @@ export const useDealsStore = create<DealsState>()(
 
         // Refresh deals list
         get().fetchDeals()
-        return data.id
+        return (data as Deal).id
       },
 
       updateDeal: async (id, updates) => {

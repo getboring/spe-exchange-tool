@@ -89,7 +89,7 @@ export function DealCard({ deal }: DealCardProps) {
           </p>
           <p
             className={`font-medium ${
-              (isCompleted ? deal.actual_profit : estimatedProfit) >= 0
+              (isCompleted ? (deal.actual_profit || 0) : estimatedProfit) >= 0
                 ? 'text-green-600'
                 : 'text-red-600'
             }`}

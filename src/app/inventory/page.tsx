@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Camera, Loader2 } from 'lucide-react'
+import { Camera, Loader2 } from 'lucide-react'
 import { useInventoryStore } from '@/stores/inventory-store'
 import { InventoryStats } from '@/components/inventory/inventory-stats'
 import { InventoryFilters } from '@/components/inventory/inventory-filters'
