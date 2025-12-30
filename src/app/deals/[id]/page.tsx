@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useDealsStore } from '@/stores/deals-store'
 import type { Deal, Item } from '@/types/database'
-import { formatCents, toDollars } from '@/lib/utils'
+import { formatCents } from '@/lib/utils'
 
 interface DealWithItems extends Deal {
   items?: Item[]
@@ -268,7 +268,7 @@ export function DealDetailPage() {
                   {isCompleted && deal.actual_roi !== null
                     ? `${deal.actual_roi.toFixed(0)}%`
                     : deal.total_cost
-                    ? `${((currentProfit / toDollars(deal.total_cost)) * 100).toFixed(0)}%`
+                    ? `${((currentProfit / deal.total_cost) * 100).toFixed(0)}%`
                     : '0%'}
                 </span>
               </div>

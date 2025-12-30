@@ -12,7 +12,6 @@ interface LotCalculatorProps {
 export function LotCalculator({ onSave, saving }: LotCalculatorProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const [askingPrice, setAskingPrice] = useState('')
-  const [isLocalPickup, setIsLocalPickup] = useState(true)
   const [source, setSource] = useState<string>(DEAL_SOURCES[0])
   const [notes, setNotes] = useState('')
 
@@ -132,32 +131,19 @@ export function LotCalculator({ onSave, saving }: LotCalculatorProps) {
       {isExpanded && (
         <div className="border-t p-4 space-y-4">
           {/* Input row */}
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="text-sm text-muted-foreground">Asking Price</label>
-              <div className="relative mt-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  $
-                </span>
-                <input
-                  type="number"
-                  value={askingPrice}
-                  onChange={(e) => setAskingPrice(e.target.value)}
-                  placeholder="0.00"
-                  className="w-full rounded-lg border bg-background py-2 pl-7 pr-3"
-                />
-              </div>
-            </div>
-            <div className="flex items-end">
-              <label className="flex items-center gap-2 rounded-lg border px-3 py-2">
-                <input
-                  type="checkbox"
-                  checked={isLocalPickup}
-                  onChange={(e) => setIsLocalPickup(e.target.checked)}
-                  className="h-4 w-4"
-                />
-                <span className="text-sm">Local Pickup</span>
-              </label>
+          <div>
+            <label className="text-sm text-muted-foreground">Asking Price</label>
+            <div className="relative mt-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                $
+              </span>
+              <input
+                type="number"
+                value={askingPrice}
+                onChange={(e) => setAskingPrice(e.target.value)}
+                placeholder="0.00"
+                className="w-full rounded-lg border bg-background py-2 pl-7 pr-3"
+              />
             </div>
           </div>
 
