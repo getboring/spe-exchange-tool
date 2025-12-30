@@ -20,12 +20,12 @@ CREATE TABLE deals (
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   source TEXT,
   notes TEXT,
-  total_cost INTEGER,        -- CENTS
-  estimated_value INTEGER,   -- CENTS
-  estimated_profit INTEGER,  -- CENTS
+  total_cost INTEGER,
+  estimated_value INTEGER,
+  estimated_profit INTEGER,
   status TEXT DEFAULT 'active',
-  actual_revenue INTEGER,    -- CENTS
-  actual_profit INTEGER,     -- CENTS
+  actual_revenue INTEGER,
+  actual_profit INTEGER,
   actual_roi NUMERIC,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -41,18 +41,18 @@ CREATE TABLE items (
   weight TEXT DEFAULT '8oz',
   status TEXT DEFAULT 'in_stock',
 
-  loose_price INTEGER,       -- CENTS
-  cib_price INTEGER,         -- CENTS
-  new_price INTEGER,         -- CENTS
-  purchase_cost INTEGER,     -- CENTS
-  estimated_value INTEGER,   -- CENTS
+  loose_price INTEGER,
+  cib_price INTEGER,
+  new_price INTEGER,
+  purchase_cost INTEGER,
+  estimated_value INTEGER,
 
-  sale_price INTEGER,        -- CENTS
+  sale_price INTEGER,
   sale_platform TEXT,
   sale_date DATE,
-  sale_fees INTEGER,         -- CENTS
-  shipping_cost INTEGER,     -- CENTS
-  actual_profit INTEGER,     -- CENTS
+  sale_fees INTEGER,
+  shipping_cost INTEGER,
+  actual_profit INTEGER,
 
   deal_id UUID REFERENCES deals(id) ON DELETE SET NULL,
   thumbnail_url TEXT,
@@ -60,15 +60,15 @@ CREATE TABLE items (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- PRICE GUIDE (local price database)
+-- PRICE GUIDE
 CREATE TABLE price_guide (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   platform TEXT NOT NULL,
   variant TEXT DEFAULT 'Standard',
-  loose_price INTEGER,       -- CENTS
-  cib_price INTEGER,         -- CENTS
-  new_price INTEGER,         -- CENTS
+  loose_price INTEGER,
+  cib_price INTEGER,
+  new_price INTEGER,
   pricecharting_id TEXT,
   last_updated TIMESTAMPTZ,
   source TEXT DEFAULT 'pricecharting',
@@ -79,7 +79,7 @@ CREATE TABLE price_guide (
 CREATE INDEX idx_price_guide_search ON price_guide(search_name);
 CREATE INDEX idx_price_guide_platform ON price_guide(platform);
 
--- SCANS (usage tracking)
+-- SCANS
 CREATE TABLE scans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -128,7 +128,7 @@ CREATE TRIGGER on_items_updated
   BEFORE UPDATE ON items
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
--- INDEXES for common queries
+-- INDEXES
 CREATE INDEX idx_items_user_id ON items(user_id);
 CREATE INDEX idx_items_status ON items(status);
 CREATE INDEX idx_items_deal_id ON items(deal_id);

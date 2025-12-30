@@ -1,0 +1,5 @@
+# Supabase local files
+.temp/
+.branches/
+.linked/
+*.local
