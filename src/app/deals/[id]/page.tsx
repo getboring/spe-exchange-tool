@@ -125,6 +125,7 @@ export function DealDetailPage() {
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
+            aria-label="Deal options"
             className="rounded-lg p-2 hover:bg-accent"
           >
             <MoreVertical className="h-5 w-5" />

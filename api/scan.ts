@@ -231,12 +231,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Try to extract JSON from markdown code block
       const jsonMatch = textContent.text.match(/```(?:json)?\s*([\s\S]*?)\s*```/)
       if (jsonMatch) {
-        items = JSON.parse(jsonMatch[1])
-      } else {
-        // Try to find array in text
+        try {
+          items = JSON.parse(jsonMatch[1])
+        } catch {
+          console.error('Failed to parse JSON from code block')
+        }
+      }
+
+      // Try to find array in text if items is still empty
+      if (!Array.isArray(items) || items.length === 0) {
         const arrayMatch = textContent.text.match(/\[[\s\S]*\]/)
         if (arrayMatch) {
-          items = JSON.parse(arrayMatch[0])
+          try {
+            items = JSON.parse(arrayMatch[0])
+          } catch {
+            console.error('Failed to parse JSON from array match')
+          }
         }
       }
     }

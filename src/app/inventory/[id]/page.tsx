@@ -334,6 +334,7 @@ export function ItemDetailPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setIsEditing(false)}
+                aria-label="Cancel editing"
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-2"
               >
                 <X className="h-4 w-4" />

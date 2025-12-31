@@ -57,3 +57,41 @@ export function getRoiIndicator(roi: number): { label: string; className: string
   if (roi >= 0) return { label: '↓', className: 'text-orange-500' }
   return { label: '✗', className: 'text-red-500' }
 }
+
+/** Calculate profit (value - cost) */
+export function calculateProfit(value: number, cost: number): number {
+  return value - cost
+}
+
+/** Calculate ROI percentage */
+export function calculateROI(profit: number, cost: number): number {
+  return cost > 0 ? (profit / cost) * 100 : 0
+}
+
+/** Get item value based on condition */
+export function getItemValueByCondition(item: {
+  condition_guess?: string
+  loose_price?: number
+  cib_price?: number
+  new_price?: number
+}): number {
+  if (item.condition_guess === 'sealed') return item.new_price || 0
+  if (item.condition_guess === 'cib') return item.cib_price || 0
+  return item.loose_price || 0
+}
+
+/** Format relative time (e.g., "5m ago", "2d ago") */
+export function formatRelativeTime(date: Date | string): string {
+  const now = new Date()
+  const then = new Date(date)
+  const diffMs = now.getTime() - then.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffDays < 7) return `${diffDays}d ago`
+  return then.toLocaleDateString()
+}

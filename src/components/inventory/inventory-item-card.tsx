@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MoreVertical, Pencil, Trash2, DollarSign, Tag } from 'lucide-react'
 import type { Item } from '@/types/database'
@@ -9,15 +9,18 @@ interface InventoryItemCardProps {
   item: Item
 }
 
-export function InventoryItemCard({ item }: InventoryItemCardProps) {
+export const InventoryItemCard = memo(function InventoryItemCard({ item }: InventoryItemCardProps) {
   const [showMenu, setShowMenu] = useState(false)
   const navigate = useNavigate()
   const { updateItem, deleteItem } = useInventoryStore()
 
-  const estimatedProfit = (item.estimated_value || 0) - (item.purchase_cost || 0)
-  const roi = item.purchase_cost && item.purchase_cost > 0
-    ? (estimatedProfit / item.purchase_cost) * 100
-    : 0
+  const { estimatedProfit, roi } = useMemo(() => {
+    const profit = (item.estimated_value || 0) - (item.purchase_cost || 0)
+    const roiValue = item.purchase_cost && item.purchase_cost > 0
+      ? (profit / item.purchase_cost) * 100
+      : 0
+    return { estimatedProfit: profit, roi: roiValue }
+  }, [item.estimated_value, item.purchase_cost])
 
   const getStatusBadge = () => {
     switch (item.status) {
@@ -69,6 +72,7 @@ export function InventoryItemCard({ item }: InventoryItemCardProps) {
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
+            aria-label="Item options"
             className="rounded p-1 hover:bg-accent"
           >
             <MoreVertical className="h-5 w-5" />
@@ -148,4 +152,4 @@ export function InventoryItemCard({ item }: InventoryItemCardProps) {
       </div>
     </div>
   )
-}
+})

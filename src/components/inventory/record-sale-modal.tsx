@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { X, DollarSign } from 'lucide-react'
 import type { Item } from '@/types/database'
 import { SELL_PLATFORMS } from '@/lib/constants'
@@ -80,14 +80,32 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
     }
   }
 
+  // Handle ESC key to close modal
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    },
+    [onClose]
+  )
+
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-lg bg-background p-6 shadow-xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onKeyDown={handleKeyDown}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        className="w-full max-w-md rounded-lg bg-background p-6 shadow-xl"
+      >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Record Sale</h2>
-          <button onClick={onClose} className="rounded p-1 hover:bg-accent">
+          <h2 id="modal-title" className="text-lg font-semibold">Record Sale</h2>
+          <button onClick={onClose} aria-label="Close" className="rounded p-1 hover:bg-accent">
             <X className="h-5 w-5" />
           </button>
         </div>

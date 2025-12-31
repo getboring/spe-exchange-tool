@@ -191,12 +191,14 @@ export function ScannedItemCard({ item }: ScannedItemCardProps) {
         <div className="flex gap-1">
           <button
             onClick={() => setIsEditing(true)}
+            aria-label="Edit item"
             className="rounded p-1.5 hover:bg-accent"
           >
             <Pencil className="h-4 w-4" />
           </button>
           <button
             onClick={() => removeItem(item.id)}
+            aria-label="Remove item"
             className="rounded p-1.5 hover:bg-accent text-destructive"
           >
             <Trash2 className="h-4 w-4" />

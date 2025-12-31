@@ -22,11 +22,13 @@ export function InventoryFilters() {
             value={filters.search}
             onChange={(e) => setFilter('search', e.target.value)}
             placeholder="Search items..."
+            aria-label="Search inventory"
             className="w-full rounded-lg border bg-background py-2 pl-10 pr-4"
           />
           {filters.search && (
             <button
               onClick={() => setFilter('search', '')}
+              aria-label="Clear search"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />

@@ -132,12 +132,13 @@ export function LotCalculator({ onSave, saving }: LotCalculatorProps) {
         <div className="border-t p-4 space-y-4">
           {/* Input row */}
           <div>
-            <label className="text-sm text-muted-foreground">Asking Price</label>
+            <label htmlFor="asking-price" className="text-sm text-muted-foreground">Asking Price</label>
             <div className="relative mt-1">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 $
               </span>
               <input
+                id="asking-price"
                 type="number"
                 value={askingPrice}
                 onChange={(e) => setAskingPrice(e.target.value)}
@@ -228,8 +229,9 @@ export function LotCalculator({ onSave, saving }: LotCalculatorProps) {
           {/* Source and notes */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-muted-foreground">Source</label>
+              <label htmlFor="deal-source" className="text-sm text-muted-foreground">Source</label>
               <select
+                id="deal-source"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 className="mt-1 w-full rounded-lg border bg-background px-3 py-2"
@@ -242,8 +244,9 @@ export function LotCalculator({ onSave, saving }: LotCalculatorProps) {
               </select>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground">Notes</label>
+              <label htmlFor="deal-notes" className="text-sm text-muted-foreground">Notes</label>
               <input
+                id="deal-notes"
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

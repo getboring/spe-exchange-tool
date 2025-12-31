@@ -86,6 +86,7 @@ export function ImageCapture({ onScan, disabled }: ImageCaptureProps) {
             <button
               onClick={handleClear}
               disabled={isScanning}
+              aria-label="Clear image"
               className="absolute right-2 top-2 rounded-full bg-background/80 p-1.5 hover:bg-background disabled:opacity-50"
             >
               <X className="h-4 w-4" />

@@ -19,6 +19,14 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      {/* Skip to main content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-background focus:p-4 focus:text-foreground"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="flex h-14 items-center justify-between px-4">
@@ -27,6 +35,7 @@ export function AppShell({ children }: AppShellProps) {
           </Link>
           <Link
             to="/settings"
+            aria-label="Settings"
             className={cn(
               'rounded-md p-2 hover:bg-accent',
               location.pathname === '/settings' && 'bg-accent'
@@ -38,7 +47,7 @@ export function AppShell({ children }: AppShellProps) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto p-4 pb-20">{children}</main>
+      <main id="main-content" className="flex-1 overflow-auto p-4 pb-20">{children}</main>
 
       {/* PWA update prompt */}
       <ReloadPrompt />

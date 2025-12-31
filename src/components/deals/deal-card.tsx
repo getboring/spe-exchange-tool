@@ -1,7 +1,8 @@
+import { memo, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Package, TrendingUp, Calendar, ChevronRight } from 'lucide-react'
 import type { Deal } from '@/types/database'
-import { formatCents } from '@/lib/utils'
+import { formatCents, calculateProfit, calculateROI } from '@/lib/utils'
 
 interface DealWithCounts extends Deal {
   itemCount?: number
@@ -12,14 +13,17 @@ interface DealCardProps {
   deal: DealWithCounts
 }
 
-export function DealCard({ deal }: DealCardProps) {
+export const DealCard = memo(function DealCard({ deal }: DealCardProps) {
   const navigate = useNavigate()
 
   const progress = deal.itemCount ? ((deal.soldCount || 0) / deal.itemCount) * 100 : 0
   const isCompleted = deal.status === 'completed'
 
-  const estimatedProfit = (deal.estimated_value || 0) - (deal.total_cost || 0)
-  const roi = deal.total_cost ? (estimatedProfit / deal.total_cost) * 100 : 0
+  const { estimatedProfit, roi } = useMemo(() => {
+    const profit = calculateProfit(deal.estimated_value || 0, deal.total_cost || 0)
+    const roiValue = calculateROI(profit, deal.total_cost || 0)
+    return { estimatedProfit: profit, roi: roiValue }
+  }, [deal.estimated_value, deal.total_cost])
 
   return (
     <button
@@ -109,4 +113,4 @@ export function DealCard({ deal }: DealCardProps) {
       </div>
     </button>
   )
-}
+})
