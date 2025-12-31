@@ -140,11 +140,12 @@ export const useInventoryStore = create<InventoryState>()(
             case 'value':
               comparison = (a.estimated_value || 0) - (b.estimated_value || 0)
               break
-            case 'profit':
+            case 'profit': {
               const aProfit = (a.estimated_value || 0) - (a.purchase_cost || 0)
               const bProfit = (b.estimated_value || 0) - (b.purchase_cost || 0)
               comparison = aProfit - bProfit
               break
+            }
             case 'date':
             default:
               comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()

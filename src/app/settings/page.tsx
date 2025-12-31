@@ -43,13 +43,14 @@ export function SettingsPage() {
     }
   }, [profile, loadFromProfile])
 
-  // Debounced save to profile
+  // Save settings to profile
   const saveSettings = useCallback(async () => {
-    if (!user?.id) return
+    const userId = user?.id
+    if (!userId) return
 
     setSaveStatus('saving')
     try {
-      await syncToProfile(user.id)
+      await syncToProfile(userId)
       await fetchProfile()
       setSaveStatus('saved')
       setHasChanges(false)
@@ -57,7 +58,7 @@ export function SettingsPage() {
     } catch {
       setSaveStatus('idle')
     }
-  }, [user?.id, syncToProfile, fetchProfile])
+  }, [user, syncToProfile, fetchProfile])
 
   // Track changes
   const handleChange = useCallback((setter: () => void) => {

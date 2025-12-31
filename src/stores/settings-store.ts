@@ -85,8 +85,6 @@ export const useSettingsStore = create<SettingsState>()(
 
             if (error) throw error
             set({ lastSynced: new Date().toISOString() })
-          } catch (err) {
-            throw err
           } finally {
             set({ syncing: false })
           }

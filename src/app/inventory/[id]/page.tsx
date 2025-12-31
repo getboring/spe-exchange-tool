@@ -42,40 +42,63 @@ export function ItemDetailPage() {
     new_price: '',
   })
 
-  const fetchItem = useCallback(async () => {
+  // Fetch item data
+  useEffect(() => {
     if (!id) return
 
-    setLoading(true)
-    const { data, error } = await supabase
+    let cancelled = false
+
+    async function loadItem() {
+      setLoading(true)
+      const { data, error: fetchError } = await supabase
+        .from('items')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (cancelled) return
+
+      if (fetchError) {
+        setError(fetchError.message)
+        setLoading(false)
+        return
+      }
+
+      const itemData = data as Item
+      setItem(itemData)
+      setEditForm({
+        name: itemData.name,
+        platform: itemData.platform || '',
+        condition: itemData.condition || '',
+        type: itemData.type || 'game',
+        weight: itemData.weight || '8oz',
+        loose_price: itemData.loose_price ? toDollars(itemData.loose_price).toFixed(2) : '',
+        cib_price: itemData.cib_price ? toDollars(itemData.cib_price).toFixed(2) : '',
+        new_price: itemData.new_price ? toDollars(itemData.new_price).toFixed(2) : '',
+      })
+      setLoading(false)
+    }
+
+    loadItem()
+
+    return () => {
+      cancelled = true
+    }
+  }, [id])
+
+  const refetchItem = useCallback(async () => {
+    if (!id) return
+
+    const { data } = await supabase
       .from('items')
       .select('*')
       .eq('id', id)
       .single()
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
+    if (data) {
+      setItem(data as Item)
     }
-
-    const itemData = data as Item
-    setItem(itemData)
-    setEditForm({
-      name: itemData.name,
-      platform: itemData.platform || '',
-      condition: itemData.condition || '',
-      type: itemData.type || 'game',
-      weight: itemData.weight || '8oz',
-      loose_price: itemData.loose_price ? toDollars(itemData.loose_price).toFixed(2) : '',
-      cib_price: itemData.cib_price ? toDollars(itemData.cib_price).toFixed(2) : '',
-      new_price: itemData.new_price ? toDollars(itemData.new_price).toFixed(2) : '',
-    })
-    setLoading(false)
   }, [id])
-
-  useEffect(() => {
-    fetchItem()
-  }, [fetchItem])
 
   const handleSave = async () => {
     if (!item) return
@@ -115,7 +138,7 @@ export function ItemDetailPage() {
       return
     }
 
-    await fetchItem()
+    await refetchItem()
     setIsEditing(false)
     setIsSaving(false)
   }
@@ -148,7 +171,7 @@ export function ItemDetailPage() {
       return
     }
 
-    await fetchItem()
+    await refetchItem()
   }
 
   if (loading) {
@@ -499,7 +522,7 @@ export function ItemDetailPage() {
         item={item}
         isOpen={showSaleModal}
         onClose={() => setShowSaleModal(false)}
-        onSaved={fetchItem}
+        onSaved={refetchItem}
       />
 
       {/* Delete confirmation modal */}
