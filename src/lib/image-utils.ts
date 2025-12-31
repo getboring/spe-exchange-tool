@@ -65,29 +65,3 @@ export function revokePreviewUrl(url: string): void {
   URL.revokeObjectURL(url)
 }
 
-/**
- * Get file from camera capture
- */
-export async function captureFromCamera(): Promise<File | null> {
-  return new Promise((resolve) => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.capture = 'environment' // Use back camera on mobile
-
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      resolve(file || null)
-    }
-
-    input.oncancel = () => resolve(null)
-    input.click()
-  })
-}
-
-/**
- * Check if device likely has a camera
- */
-export function hasCamera(): boolean {
-  return 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices
-}

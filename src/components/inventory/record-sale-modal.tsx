@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { X, DollarSign } from 'lucide-react'
 import type { Item, ItemUpdate } from '@/types/database'
 import { SELL_PLATFORMS } from '@/lib/constants'
@@ -16,6 +16,7 @@ interface RecordSaleModalProps {
 
 export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleModalProps) {
   const { ebayStoreType, promotedPercent } = useSettingsStore()
+  const firstInputRef = useRef<HTMLInputElement>(null)
 
   const [salePrice, setSalePrice] = useState('')
   const [platform, setPlatform] = useState<string>('eBay')
@@ -27,12 +28,33 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Pre-fill sale price with estimated value
+  // Pre-fill sale price with estimated value and focus first input
   useEffect(() => {
     if (isOpen && item.estimated_value) {
       setSalePrice(toDollars(item.estimated_value).toFixed(2))
+      // Focus first input after render
+      setTimeout(() => firstInputRef.current?.focus(), 0)
     }
   }, [isOpen, item.estimated_value])
+
+  // Handle ESC key and prevent body scroll
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, onClose])
 
   const calculatedFees = useAutoFees
     ? autoCalculateFees(
@@ -81,10 +103,10 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
     }
   }
 
-  // Handle ESC key to close modal
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') {
+  // Handle backdrop click
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
         onClose()
       }
     },
@@ -96,16 +118,17 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onKeyDown={handleKeyDown}
+      onClick={handleBackdropClick}
+      role="presentation"
     >
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="modal-title"
+        aria-labelledby="record-sale-title"
         className="w-full max-w-md rounded-lg bg-background p-6 shadow-xl"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 id="modal-title" className="text-lg font-semibold">Record Sale</h2>
+          <h2 id="record-sale-title" className="text-lg font-semibold">Record Sale</h2>
           <button onClick={onClose} aria-label="Close" className="rounded p-1 hover:bg-accent">
             <X className="h-5 w-5" />
           </button>
@@ -118,12 +141,14 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Sale Price */}
           <div>
-            <label className="text-sm text-muted-foreground">Sale Price</label>
+            <label htmlFor="sale-price" className="text-sm text-muted-foreground">Sale Price</label>
             <div className="relative mt-1">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 $
               </span>
               <input
+                ref={firstInputRef}
+                id="sale-price"
                 type="number"
                 step="0.01"
                 value={salePrice}
@@ -137,8 +162,9 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
 
           {/* Platform */}
           <div>
-            <label className="text-sm text-muted-foreground">Platform</label>
+            <label htmlFor="sale-platform" className="text-sm text-muted-foreground">Platform</label>
             <select
+              id="sale-platform"
               value={platform}
               onChange={(e) => setPlatform(e.target.value)}
               className="mt-1 w-full rounded-lg border bg-background px-3 py-2"
@@ -154,12 +180,13 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
           {/* Shipping */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-muted-foreground">Shipping Charged</label>
+              <label htmlFor="shipping-charged" className="text-sm text-muted-foreground">Shipping Charged</label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
                 </span>
                 <input
+                  id="shipping-charged"
                   type="number"
                   step="0.01"
                   value={shippingCharged}
@@ -170,12 +197,13 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
               </div>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground">Your Shipping Cost</label>
+              <label htmlFor="shipping-cost" className="text-sm text-muted-foreground">Your Shipping Cost</label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
                 </span>
                 <input
+                  id="shipping-cost"
                   type="number"
                   step="0.01"
                   value={shippingCost}
@@ -190,9 +218,10 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
           {/* Fees */}
           <div>
             <div className="flex items-center justify-between">
-              <label className="text-sm text-muted-foreground">Fees</label>
-              <label className="flex items-center gap-2 text-sm">
+              <span className="text-sm text-muted-foreground">Fees</span>
+              <label htmlFor="auto-fees" className="flex items-center gap-2 text-sm">
                 <input
+                  id="auto-fees"
                   type="checkbox"
                   checked={useAutoFees}
                   onChange={(e) => setUseAutoFees(e.target.checked)}
@@ -211,12 +240,14 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
                   $
                 </span>
                 <input
+                  id="manual-fees"
                   type="number"
                   step="0.01"
                   value={manualFees}
                   onChange={(e) => setManualFees(e.target.value)}
                   className="w-full rounded-lg border bg-background py-2 pl-7 pr-3"
                   placeholder="0.00"
+                  aria-label="Manual fees"
                 />
               </div>
             )}
@@ -224,8 +255,9 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
 
           {/* Sale Date */}
           <div>
-            <label className="text-sm text-muted-foreground">Sale Date</label>
+            <label htmlFor="sale-date" className="text-sm text-muted-foreground">Sale Date</label>
             <input
+              id="sale-date"
               type="date"
               value={saleDate}
               onChange={(e) => setSaleDate(e.target.value)}
@@ -257,7 +289,7 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
           </div>
 
           {error && (
-            <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+            <div role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
               {error}
             </div>
           )}

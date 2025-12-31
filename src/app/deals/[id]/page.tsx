@@ -11,6 +11,7 @@ import {
   MoreVertical,
 } from 'lucide-react'
 import { useDealsStore } from '@/stores/deals-store'
+import { ConfirmModal } from '@/components/ui/confirm-modal'
 import type { Deal, Item } from '@/types/database'
 import { formatCents } from '@/lib/utils'
 
@@ -29,6 +30,7 @@ export function DealDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     async function loadDeal() {
@@ -45,10 +47,13 @@ export function DealDetailPage() {
     loadDeal()
   }, [id, fetchDealById])
 
-  const handleDelete = async () => {
-    if (!id || !confirm('Are you sure you want to delete this deal? Items will be unlinked but not deleted.')) {
-      return
-    }
+  const handleDeleteClick = () => {
+    setShowMenu(false)
+    setShowDeleteConfirm(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!id) return
     await deleteDeal(id)
     navigate('/deals')
   }
@@ -143,7 +148,7 @@ export function DealDetailPage() {
                 </button>
               )}
               <button
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />
@@ -324,6 +329,16 @@ export function DealDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Deal"
+        message="Are you sure you want to delete this deal? Items will be unlinked but not deleted."
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   )
 }

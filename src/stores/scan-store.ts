@@ -21,7 +21,6 @@ interface ScanState {
   setScannedItems: (items: ScannedItem[]) => void
   updateItem: (id: string, updates: Partial<ScannedItem>) => void
   removeItem: (id: string) => void
-  clearResults: () => void
   setScanning: (scanning: boolean) => void
   setError: (error: string | null) => void
   reset: () => void
@@ -61,9 +60,6 @@ export const useScanStore = create<ScanState>()(
         set((state) => ({
           scannedItems: state.scannedItems.filter((item) => item.id !== id),
         })),
-
-      clearResults: () =>
-        set({ scannedItems: [] }),
 
       setScanning: (scanning) =>
         set({ isScanning: scanning }),

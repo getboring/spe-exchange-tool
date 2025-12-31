@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from 'react'
 import { useSettingsStore } from '@/stores/settings-store'
 import { useAuthStore } from '@/stores/auth-store'
+import { ConfirmModal } from '@/components/ui/confirm-modal'
 import { EBAY_STORE_TYPES, WEIGHTS, SELL_PLATFORMS } from '@/lib/constants'
 import { LogOut, Save, RefreshCw, Download, Trash2, Check } from 'lucide-react'
 
@@ -33,6 +34,7 @@ export function SettingsPage() {
   const { user, profile, signOut, fetchProfile } = useAuthStore()
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const [hasChanges, setHasChanges] = useState(false)
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
 
   // Load settings from profile on mount
   useEffect(() => {
@@ -63,15 +65,13 @@ export function SettingsPage() {
     setHasChanges(true)
   }, [])
 
-  const handleExportData = async () => {
-    // Placeholder for data export
-    alert('Export functionality coming soon')
+  const handleExportData = () => {
+    // TODO: Implement data export
   }
 
-  const handleClearData = async () => {
-    if (confirm('Are you sure you want to clear all your data? This cannot be undone.')) {
-      alert('Clear functionality coming soon')
-    }
+  const handleClearDataConfirm = () => {
+    // TODO: Implement data clearing
+    setShowClearConfirm(false)
   }
 
   return (
@@ -236,7 +236,7 @@ export function SettingsPage() {
               </p>
             </div>
             <button
-              onClick={handleClearData}
+              onClick={() => setShowClearConfirm(true)}
               className="flex items-center gap-2 rounded-lg border border-destructive/50 px-4 py-2 text-sm text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4" />
@@ -284,6 +284,16 @@ export function SettingsPage() {
           </button>
         </div>
       </section>
+
+      {/* Clear data confirmation modal */}
+      <ConfirmModal
+        isOpen={showClearConfirm}
+        title="Clear All Data"
+        message="Are you sure you want to permanently delete all your inventory, deals, and scan history? This cannot be undone."
+        confirmLabel="Clear All Data"
+        onConfirm={handleClearDataConfirm}
+        onCancel={() => setShowClearConfirm(false)}
+      />
     </div>
   )
 }

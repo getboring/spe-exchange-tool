@@ -4,6 +4,7 @@ import { MoreVertical, Pencil, Trash2, DollarSign, Tag } from 'lucide-react'
 import type { Item } from '@/types/database'
 import { formatCents } from '@/lib/utils'
 import { useInventoryStore } from '@/stores/inventory-store'
+import { ConfirmModal } from '@/components/ui/confirm-modal'
 
 interface InventoryItemCardProps {
   item: Item
@@ -11,6 +12,7 @@ interface InventoryItemCardProps {
 
 export const InventoryItemCard = memo(function InventoryItemCard({ item }: InventoryItemCardProps) {
   const [showMenu, setShowMenu] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const navigate = useNavigate()
   const { updateItem, deleteItem } = useInventoryStore()
 
@@ -38,11 +40,14 @@ export const InventoryItemCard = memo(function InventoryItemCard({ item }: Inven
     setShowMenu(false)
   }
 
-  const handleDelete = async () => {
-    if (confirm('Delete this item?')) {
-      await deleteItem(item.id)
-    }
+  const handleDeleteClick = () => {
     setShowMenu(false)
+    setShowDeleteConfirm(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    await deleteItem(item.id)
+    setShowDeleteConfirm(false)
   }
 
   return (
@@ -112,7 +117,7 @@ export const InventoryItemCard = memo(function InventoryItemCard({ item }: Inven
                 )}
                 <hr className="my-1" />
                 <button
-                  onClick={handleDelete}
+                  onClick={handleDeleteClick}
                   className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -150,6 +155,15 @@ export const InventoryItemCard = memo(function InventoryItemCard({ item }: Inven
           </span>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Item"
+        message={`Are you sure you want to delete "${item.name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   )
 })

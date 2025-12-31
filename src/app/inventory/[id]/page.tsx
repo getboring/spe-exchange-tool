@@ -15,6 +15,7 @@ import { formatCents, toCents, toDollars } from '@/lib/utils'
 import { PLATFORMS, CONDITIONS, WEIGHTS, ITEM_TYPES } from '@/lib/constants'
 import { PlatformProfits } from '@/components/inventory/platform-profits'
 import { RecordSaleModal } from '@/components/inventory/record-sale-modal'
+import { ConfirmModal } from '@/components/ui/confirm-modal'
 import type { Item, ItemUpdate } from '@/types/database'
 
 export function ItemDetailPage() {
@@ -27,6 +28,7 @@ export function ItemDetailPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [showSaleModal, setShowSaleModal] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -118,13 +120,14 @@ export function ItemDetailPage() {
     setIsSaving(false)
   }
 
-  const handleDelete = async () => {
-    if (!item || !confirm('Delete this item? This cannot be undone.')) return
+  const handleDeleteConfirm = async () => {
+    if (!item) return
 
     const { error } = await supabase.from('items').delete().eq('id', item.id)
 
     if (error) {
       setError(error.message)
+      setShowDeleteConfirm(false)
       return
     }
 
@@ -198,7 +201,7 @@ export function ItemDetailPage() {
                 Edit
               </button>
               <button
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />
@@ -497,6 +500,16 @@ export function ItemDetailPage() {
         isOpen={showSaleModal}
         onClose={() => setShowSaleModal(false)}
         onSaved={fetchItem}
+      />
+
+      {/* Delete confirmation modal */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Item"
+        message={`Are you sure you want to delete "${item.name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
       />
     </div>
   )

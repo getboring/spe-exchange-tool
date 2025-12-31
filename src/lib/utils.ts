@@ -27,14 +27,6 @@ export function toDollars(cents: Cents): number {
   return cents / 100
 }
 
-/** Parse price string to cents: "$35.00" or "35" → 3500 */
-export function parseToCents(value: string | number): Cents {
-  if (typeof value === 'number') return toCents(value)
-  const cleaned = value.replace(/[$,]/g, '')
-  const dollars = parseFloat(cleaned) || 0
-  return toCents(dollars)
-}
-
 /** Parse price, returns dollars (for backwards compat with transplanted code) */
 export function parsePrice(value: string | number | null | undefined): number {
   if (value === null || value === undefined) return 0
@@ -49,15 +41,6 @@ export function formatPercent(value: number): string {
   return `${value.toFixed(0)}%`
 }
 
-/** Format ROI with color indicator */
-export function getRoiIndicator(roi: number): { label: string; className: string } {
-  if (roi >= 100) return { label: '🔥', className: 'text-green-600' }
-  if (roi >= 50) return { label: '✓', className: 'text-green-500' }
-  if (roi >= 20) return { label: '~', className: 'text-yellow-500' }
-  if (roi >= 0) return { label: '↓', className: 'text-orange-500' }
-  return { label: '✗', className: 'text-red-500' }
-}
-
 /** Calculate profit (value - cost) */
 export function calculateProfit(value: number, cost: number): number {
   return value - cost
@@ -66,18 +49,6 @@ export function calculateProfit(value: number, cost: number): number {
 /** Calculate ROI percentage */
 export function calculateROI(profit: number, cost: number): number {
   return cost > 0 ? (profit / cost) * 100 : 0
-}
-
-/** Get item value based on condition */
-export function getItemValueByCondition(item: {
-  condition_guess?: string
-  loose_price?: number
-  cib_price?: number
-  new_price?: number
-}): number {
-  if (item.condition_guess === 'sealed') return item.new_price || 0
-  if (item.condition_guess === 'cib') return item.cib_price || 0
-  return item.loose_price || 0
 }
 
 /** Format relative time (e.g., "5m ago", "2d ago") */
