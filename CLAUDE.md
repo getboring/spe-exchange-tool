@@ -16,7 +16,8 @@ A reselling tool that scans items, identifies them via AI, calculates profit acr
 | **Git Remote** | `git@github.com:getboring/spe-exchange-tool.git` |
 | **Branch** | `main` |
 | **Hosting** | Vercel |
-| **Live URL** | TBD |
+| **Live URL** | https://spe-exchange-tool-7q3blb07q-maxtorborings-projects.vercel.app |
+| **Supabase** | `sfwetbqgtmhgcgmsmbnb` (TechExchangeApp) |
 
 ---
 
@@ -27,7 +28,7 @@ A reselling tool that scans items, identifies them via AI, calculates profit acr
 - shadcn/ui (components.json configured)
 - Zustand (state management)
 - Supabase (auth, database, storage)
-- AI Vision: Claude claude-sonnet-4-20250514 via Edge Functions
+- AI Vision: Claude Sonnet 4 via Vercel serverless (`/api/scan`)
 
 ---
 
@@ -52,7 +53,7 @@ git push             # Deploy to Vercel (automatic)
 | `src/stores/` | Zustand stores |
 | `src/types/` | TypeScript types |
 | `supabase/migrations/` | Database schema |
-| `supabase/functions/` | Edge functions (AI scanning) |
+| `api/scan.ts` | AI scanning endpoint (Vercel serverless) |
 
 ---
 
