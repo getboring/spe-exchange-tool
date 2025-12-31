@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useScanStore } from '@/stores/scan-store'
+import { useAuthStore } from '@/stores/auth-store'
 import { useSaveScan } from '@/hooks/use-save-scan'
 import { ImageCapture } from '@/components/scan/image-capture'
 import { ScanResults } from '@/components/scan/scan-results'
@@ -18,11 +19,17 @@ export function ScanPage() {
     reset,
   } = useScanStore()
 
+  const { session } = useAuthStore()
   const { saving, error: saveError, saveScan } = useSaveScan()
 
   const handleScan = useCallback(async () => {
     if (!imageData || !mediaType) {
       setError('Please capture or upload an image first')
+      return
+    }
+
+    if (!session?.access_token) {
+      setError('Please sign in to scan items')
       return
     }
 
@@ -34,6 +41,7 @@ export function ScanPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           image: imageData,
@@ -69,6 +77,10 @@ export function ScanPage() {
           setError('Scan timed out. Try a smaller image.')
         } else if (err.message.includes('network') || err.message.includes('fetch')) {
           setError('No internet connection. Scanning requires internet.')
+        } else if (err.message.includes('Too many requests')) {
+          setError('Too many scans. Please wait a minute before trying again.')
+        } else if (err.message.includes('Authentication') || err.message.includes('token')) {
+          setError('Session expired. Please refresh the page and try again.')
         } else {
           setError(err.message)
         }
@@ -78,7 +90,7 @@ export function ScanPage() {
     } finally {
       setScanning(false)
     }
-  }, [imageData, mediaType, setScannedItems, setScanning, setError])
+  }, [imageData, mediaType, session, setScannedItems, setScanning, setError])
 
   const handleSave = useCallback(
     async (askingPrice: number, source: string, notes: string) => {

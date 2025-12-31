@@ -1,4 +1,51 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { createClient } from '@supabase/supabase-js'
+
+// Rate limiting: track requests per IP (in-memory, resets on cold start)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+const RATE_LIMIT_WINDOW_MS = 60 * 1000 // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 10 // 10 requests per minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS })
+    return false
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return true
+  }
+
+  entry.count++
+  return false
+}
+
+// Allowed origins for CORS (production domains)
+const ALLOWED_ORIGINS = [
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  process.env.ALLOWED_ORIGIN,
+  'http://localhost:5173', // Local dev
+  'http://localhost:4173', // Local preview
+].filter(Boolean) as string[]
+
+function getCorsOrigin(requestOrigin: string | undefined): string | null {
+  if (!requestOrigin) return null
+
+  // Check exact match
+  if (ALLOWED_ORIGINS.includes(requestOrigin)) {
+    return requestOrigin
+  }
+
+  // Allow any *.vercel.app subdomain for preview deployments
+  if (requestOrigin.match(/^https:\/\/[a-z0-9-]+\.vercel\.app$/)) {
+    return requestOrigin
+  }
+
+  return null
+}
 
 // Platforms and weights for the prompt (must match src/lib/constants.ts)
 const PLATFORMS = [
@@ -44,17 +91,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('X-Frame-Options', 'DENY')
   res.setHeader('X-XSS-Protection', '1; mode=block')
 
+  // Handle CORS with origin validation
+  const origin = req.headers.origin as string | undefined
+  const allowedOrigin = getCorsOrigin(origin)
+
+  if (allowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin)
+    res.setHeader('Access-Control-Allow-Credentials', 'true')
+  }
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     return res.status(200).end()
   }
 
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  // Rate limiting
+  const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
+    || req.socket?.remoteAddress
+    || 'unknown'
+
+  if (isRateLimited(clientIp)) {
+    return res.status(429).json({
+      error: 'Too many requests. Please wait a minute before scanning again.'
+    })
+  }
+
+  // Authentication: Verify Supabase JWT
+  const authHeader = req.headers.authorization
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authentication required' })
+  }
+
+  const token = authHeader.replace('Bearer ', '')
+
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
+  const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Supabase credentials not configured')
+    return res.status(500).json({ error: 'Server configuration error' })
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+
+  if (authError || !user) {
+    return res.status(401).json({ error: 'Invalid or expired token' })
   }
 
   // Check for API key
