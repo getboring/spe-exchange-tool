@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# SPE Exchange Tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A video game reselling tool with barcode scanning and AI-powered price lookup. Scan items, identify them via AI, calculate profit across platforms, and track inventory.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **AI-Powered Scanning**: Use Claude vision to identify video games from photos
+- **Barcode Scanning**: Quick lookup via UPC/barcode
+- **Multi-Platform Pricing**: Compare prices across eBay, Amazon, and more
+- **Profit Calculator**: Calculate fees and shipping costs automatically
+- **Inventory Tracking**: Manage your reselling inventory
+- **PWA Support**: Install as a mobile app for on-the-go scanning
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript + Vite
+- Tailwind CSS 4
+- shadcn/ui components
+- Zustand (state management)
+- Supabase (auth, database, storage)
+- Claude AI via Supabase Edge Functions
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 18+
+- npm or yarn
+- Supabase account
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Clone the repository
+git clone https://github.com/getboring/spe-exchange-tool.git
+cd spe-exchange-tool
+
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env.local` file with:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+## Development
+
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
+```
+
+## Deployment
+
+This project is configured for automatic deployment to Vercel. Push to `main` to deploy.
+
+## Project Structure
+
+```
+src/
+  app/           # Page components
+  components/    # Reusable UI components
+  hooks/         # Custom React hooks
+  lib/           # Business logic, utilities
+  stores/        # Zustand state stores
+  types/         # TypeScript type definitions
+supabase/
+  migrations/    # Database schema migrations
+  functions/     # Edge functions (AI scanning)
+```
+
+## Price Format
+
+All prices are stored as integers in cents (e.g., 3500 = $35.00). Use the utility functions in `src/lib/utils.ts`:
+- `toCents()` - Convert dollars to cents
+- `toDollars()` - Convert cents to dollars
+- `formatCents()` - Format cents as currency string
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
