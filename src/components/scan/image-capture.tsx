@@ -22,8 +22,8 @@ export function ImageCapture({ onScan, disabled }: ImageCaptureProps) {
         const { base64, mediaType } = await compressImage(file)
 
         setImage(base64, preview, mediaType)
-      } catch (error) {
-        console.error('Error processing image:', error)
+      } catch {
+        // Image processing failed silently
       }
     },
     [setImage]

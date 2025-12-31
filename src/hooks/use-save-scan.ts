@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/auth-store'
 import { useScanStore } from '@/stores/scan-store'
 import { toCents } from '@/lib/utils'
-import type { ScannedItem, Deal, Item, Scan, DealInsert, ItemInsert, ScanInsert } from '@/types/database'
+import type { ScannedItem, Deal, Item, DealInsert, ItemInsert, ScanInsert } from '@/types/database'
 
 interface SaveScanResult {
   saving: boolean
@@ -61,7 +61,7 @@ export function useSaveScan(): SaveScanResult {
 
         const { data: deal, error: dealError } = await supabase
           .from('deals')
-          .insert(dealInsert)
+          .insert(dealInsert as never)
           .select()
           .single()
 
@@ -103,7 +103,7 @@ export function useSaveScan(): SaveScanResult {
         })
 
         // Insert items
-        const { error: itemsError } = await supabase.from('items').insert(items)
+        const { error: itemsError } = await supabase.from('items').insert(items as never)
 
         if (itemsError) {
           throw new Error(`Failed to save items: ${itemsError.message}`)
@@ -114,13 +114,12 @@ export function useSaveScan(): SaveScanResult {
           user_id: user.id,
           items_found: scannedItems.length,
         }
-        await supabase.from('scans').insert(scanInsert)
+        await supabase.from('scans').insert(scanInsert as never)
 
         // Reset scan state and navigate to inventory
         reset()
         navigate('/inventory')
       } catch (err) {
-        console.error('Save error:', err)
         setError(err instanceof Error ? err.message : 'Failed to save items')
       } finally {
         setSaving(false)

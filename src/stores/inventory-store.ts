@@ -76,7 +76,7 @@ export const useInventoryStore = create<InventoryState>()(
         const itemUpdate: ItemUpdate = updates
         const { error } = await supabase
           .from('items')
-          .update(itemUpdate)
+          .update(itemUpdate as never)
           .eq('id', id)
 
         if (error) {

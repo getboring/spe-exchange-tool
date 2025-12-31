@@ -89,7 +89,7 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
       }
       const { error: updateError } = await supabase
         .from('items')
-        .update(saleUpdate)
+        .update(saleUpdate as never)
         .eq('id', item.id)
 
       if (updateError) throw updateError

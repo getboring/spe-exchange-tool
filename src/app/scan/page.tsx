@@ -71,7 +71,6 @@ export function ScanPage() {
 
       setScannedItems(itemsWithIds)
     } catch (err) {
-      console.error('Scan error:', err)
       if (err instanceof Error) {
         if (err.message.includes('timeout') || err.message.includes('Timeout')) {
           setError('Scan timed out. Try a smaller image.')

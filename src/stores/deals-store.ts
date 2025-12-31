@@ -125,7 +125,7 @@ export const useDealsStore = create<DealsState>()(
         const dealInsert: DealInsert = deal
         const { data, error } = await supabase
           .from('deals')
-          .insert(dealInsert)
+          .insert(dealInsert as never)
           .select()
           .single()
 
@@ -143,7 +143,7 @@ export const useDealsStore = create<DealsState>()(
         const dealUpdate: DealUpdate = updates
         const { error } = await supabase
           .from('deals')
-          .update(dealUpdate)
+          .update(dealUpdate as never)
           .eq('id', id)
 
         if (error) {
@@ -164,7 +164,7 @@ export const useDealsStore = create<DealsState>()(
         const unlinkUpdate: ItemUpdate = { deal_id: null }
         await supabase
           .from('items')
-          .update(unlinkUpdate)
+          .update(unlinkUpdate as never)
           .eq('deal_id', id)
 
         // Then delete the deal

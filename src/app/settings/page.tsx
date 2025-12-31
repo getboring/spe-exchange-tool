@@ -66,11 +66,11 @@ export function SettingsPage() {
   }, [])
 
   const handleExportData = () => {
-    // TODO: Implement data export
+    alert('Coming soon')
   }
 
   const handleClearDataConfirm = () => {
-    // TODO: Implement data clearing
+    alert('Coming soon')
     setShowClearConfirm(false)
   }
 

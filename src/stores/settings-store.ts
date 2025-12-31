@@ -80,13 +80,12 @@ export const useSettingsStore = create<SettingsState>()(
             }
             const { error } = await supabase
               .from('profiles')
-              .update(profileUpdate)
+              .update(profileUpdate as never)
               .eq('id', userId)
 
             if (error) throw error
             set({ lastSynced: new Date().toISOString() })
           } catch (err) {
-            console.error('Failed to sync settings:', err)
             throw err
           } finally {
             set({ syncing: false })

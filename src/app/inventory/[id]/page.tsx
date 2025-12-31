@@ -95,8 +95,8 @@ export function ItemDetailPage() {
 
     const itemUpdate: ItemUpdate = {
       name: editForm.name,
-      platform: editForm.platform || null,
-      condition: editForm.condition || null,
+      platform: (editForm.platform || null) as Item['platform'],
+      condition: (editForm.condition || null) as Item['condition'],
       type: editForm.type as Item['type'],
       weight: editForm.weight as Item['weight'],
       loose_price: editForm.loose_price ? toCents(parseFloat(editForm.loose_price)) : null,
@@ -106,7 +106,7 @@ export function ItemDetailPage() {
     }
     const { error: updateError } = await supabase
       .from('items')
-      .update(itemUpdate)
+      .update(itemUpdate as never)
       .eq('id', item.id)
 
     if (updateError) {
@@ -140,7 +140,7 @@ export function ItemDetailPage() {
     const statusUpdate: ItemUpdate = { status: newStatus }
     const { error } = await supabase
       .from('items')
-      .update(statusUpdate)
+      .update(statusUpdate as never)
       .eq('id', item.id)
 
     if (error) {

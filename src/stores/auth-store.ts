@@ -86,7 +86,6 @@ export const useAuthStore = create<AuthState>()(
             .single()
 
           if (error) {
-            console.error('Error fetching profile:', error)
             return
           }
 
