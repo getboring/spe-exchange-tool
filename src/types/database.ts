@@ -177,3 +177,11 @@ export interface Database {
     }
   }
 }
+
+// Type aliases for Supabase operations (eliminates need for `as never` casts)
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+export type ItemInsert = Database['public']['Tables']['items']['Insert']
+export type ItemUpdate = Database['public']['Tables']['items']['Update']
+export type DealInsert = Database['public']['Tables']['deals']['Insert']
+export type DealUpdate = Database['public']['Tables']['deals']['Update']
+export type ScanInsert = Database['public']['Tables']['scans']['Insert']

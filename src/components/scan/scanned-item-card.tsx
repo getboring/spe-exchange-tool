@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { Pencil, Trash2, Check, X, AlertCircle, CheckCircle, AlertTriangle } from 'lucide-react'
 import type { ScannedItem } from '@/types/database'
 import { CONDITIONS, WEIGHTS } from '@/lib/constants'
@@ -8,7 +8,7 @@ interface ScannedItemCardProps {
   item: ScannedItem
 }
 
-export function ScannedItemCard({ item }: ScannedItemCardProps) {
+export const ScannedItemCard = memo(function ScannedItemCard({ item }: ScannedItemCardProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValues, setEditValues] = useState({
     name: item.name,
@@ -226,4 +226,4 @@ export function ScannedItemCard({ item }: ScannedItemCardProps) {
       )}
     </div>
   )
-}
+})

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { X, DollarSign } from 'lucide-react'
-import type { Item } from '@/types/database'
+import type { Item, ItemUpdate } from '@/types/database'
 import { SELL_PLATFORMS } from '@/lib/constants'
 import { autoCalculateFees } from '@/lib/fees'
 import { formatCents, toDollars, toCents } from '@/lib/utils'
@@ -56,17 +56,18 @@ export function RecordSaleModal({ item, isOpen, onClose, onSaved }: RecordSaleMo
     setSaving(true)
 
     try {
+      const saleUpdate: ItemUpdate = {
+        status: 'sold',
+        sale_price: toCents(parseFloat(salePrice) || 0),
+        sale_platform: platform,
+        sale_date: saleDate,
+        sale_fees: toCents(calculatedFees),
+        shipping_cost: toCents(parseFloat(shippingCost) || 0),
+        actual_profit: toCents(profit),
+      }
       const { error: updateError } = await supabase
         .from('items')
-        .update({
-          status: 'sold',
-          sale_price: toCents(parseFloat(salePrice) || 0),
-          sale_platform: platform,
-          sale_date: saleDate,
-          sale_fees: toCents(calculatedFees),
-          shipping_cost: toCents(parseFloat(shippingCost) || 0),
-          actual_profit: toCents(profit),
-        } as never)
+        .update(saleUpdate)
         .eq('id', item.id)
 
       if (updateError) throw updateError

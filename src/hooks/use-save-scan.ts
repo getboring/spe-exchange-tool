@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/auth-store'
 import { useScanStore } from '@/stores/scan-store'
 import { toCents } from '@/lib/utils'
-import type { ScannedItem, Deal, Item, Scan } from '@/types/database'
+import type { ScannedItem, Deal, Item, Scan, DealInsert, ItemInsert, ScanInsert } from '@/types/database'
 
 interface SaveScanResult {
   saving: boolean
@@ -46,7 +46,7 @@ export function useSaveScan(): SaveScanResult {
         const estimatedProfit = totalValue - askingPrice
 
         // Create deal record
-        const dealInsert: Omit<Deal, 'id' | 'created_at'> = {
+        const dealInsert: DealInsert = {
           user_id: user.id,
           source: source || null,
           notes: notes || null,
@@ -61,7 +61,7 @@ export function useSaveScan(): SaveScanResult {
 
         const { data: deal, error: dealError } = await supabase
           .from('deals')
-          .insert(dealInsert as never)
+          .insert(dealInsert)
           .select()
           .single()
 
@@ -73,7 +73,7 @@ export function useSaveScan(): SaveScanResult {
         const dealData = deal as Deal
 
         // Allocate cost weighted by value
-        const items = scannedItems.map((item) => {
+        const items: ItemInsert[] = scannedItems.map((item) => {
           const itemValue = getItemValue(item)
           const weight = totalValue > 0 ? itemValue / totalValue : 1 / scannedItems.length
           const allocatedCost = askingPrice * weight
@@ -103,18 +103,18 @@ export function useSaveScan(): SaveScanResult {
         })
 
         // Insert items
-        const { error: itemsError } = await supabase.from('items').insert(items as never[])
+        const { error: itemsError } = await supabase.from('items').insert(items)
 
         if (itemsError) {
           throw new Error(`Failed to save items: ${itemsError.message}`)
         }
 
         // Record scan
-        const scanInsert: Omit<Scan, 'id' | 'created_at'> = {
+        const scanInsert: ScanInsert = {
           user_id: user.id,
           items_found: scannedItems.length,
         }
-        await supabase.from('scans').insert(scanInsert as never)
+        await supabase.from('scans').insert(scanInsert)
 
         // Reset scan state and navigate to inventory
         reset()

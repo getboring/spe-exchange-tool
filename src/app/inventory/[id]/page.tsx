@@ -15,7 +15,7 @@ import { formatCents, toCents, toDollars } from '@/lib/utils'
 import { PLATFORMS, CONDITIONS, WEIGHTS, ITEM_TYPES } from '@/lib/constants'
 import { PlatformProfits } from '@/components/inventory/platform-profits'
 import { RecordSaleModal } from '@/components/inventory/record-sale-modal'
-import type { Item } from '@/types/database'
+import type { Item, ItemUpdate } from '@/types/database'
 
 export function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -91,19 +91,20 @@ export function ItemDetailPage() {
       estimatedValue = toCents(parseFloat(editForm.loose_price))
     }
 
+    const itemUpdate: ItemUpdate = {
+      name: editForm.name,
+      platform: editForm.platform || null,
+      condition: editForm.condition || null,
+      type: editForm.type as Item['type'],
+      weight: editForm.weight as Item['weight'],
+      loose_price: editForm.loose_price ? toCents(parseFloat(editForm.loose_price)) : null,
+      cib_price: editForm.cib_price ? toCents(parseFloat(editForm.cib_price)) : null,
+      new_price: editForm.new_price ? toCents(parseFloat(editForm.new_price)) : null,
+      estimated_value: estimatedValue || null,
+    }
     const { error: updateError } = await supabase
       .from('items')
-      .update({
-        name: editForm.name,
-        platform: editForm.platform || null,
-        condition: editForm.condition || null,
-        type: editForm.type,
-        weight: editForm.weight,
-        loose_price: editForm.loose_price ? toCents(parseFloat(editForm.loose_price)) : null,
-        cib_price: editForm.cib_price ? toCents(parseFloat(editForm.cib_price)) : null,
-        new_price: editForm.new_price ? toCents(parseFloat(editForm.new_price)) : null,
-        estimated_value: estimatedValue || null,
-      } as never)
+      .update(itemUpdate)
       .eq('id', item.id)
 
     if (updateError) {
@@ -133,9 +134,10 @@ export function ItemDetailPage() {
   const handleStatusChange = async (newStatus: Item['status']) => {
     if (!item) return
 
+    const statusUpdate: ItemUpdate = { status: newStatus }
     const { error } = await supabase
       .from('items')
-      .update({ status: newStatus } as never)
+      .update(statusUpdate)
       .eq('id', item.id)
 
     if (error) {

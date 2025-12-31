@@ -105,8 +105,16 @@ export const useAuthStore = create<AuthState>()(
   )
 )
 
+// Track subscription to prevent duplicates (React StrictMode calls twice)
+let authSubscription: { unsubscribe: () => void } | null = null
+
 // Initialize auth state on app load
 export async function initializeAuth() {
+  // Prevent duplicate subscriptions
+  if (authSubscription) {
+    return
+  }
+
   const { setUser, setSession, setLoading, setInitialized, fetchProfile } = useAuthStore.getState()
 
   // Get initial session
@@ -121,8 +129,8 @@ export async function initializeAuth() {
   setLoading(false)
   setInitialized(true)
 
-  // Listen for auth changes
-  supabase.auth.onAuthStateChange(async (_event, session) => {
+  // Listen for auth changes - store subscription for cleanup (Context7 pattern)
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
     setUser(session?.user ?? null)
     setSession(session)
 
@@ -132,4 +140,6 @@ export async function initializeAuth() {
       useAuthStore.setState({ profile: null })
     }
   })
+
+  authSubscription = subscription
 }

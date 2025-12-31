@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, devtools } from 'zustand/middleware'
 import type { EbayStoreType, Weight, SellPlatform } from '@/lib/constants'
-import type { Profile } from '@/types/database'
+import type { Profile, ProfileUpdate } from '@/types/database'
 import { supabase } from '@/lib/supabase'
 
 interface SettingsState {
@@ -71,15 +71,16 @@ export const useSettingsStore = create<SettingsState>()(
           set({ syncing: true })
 
           try {
+            const profileUpdate: ProfileUpdate = {
+              ebay_store_type: state.ebayStoreType,
+              promoted_percent: state.promotedPercent,
+              target_roi: state.targetRoi,
+              default_weight: state.defaultWeight,
+              default_sell_platform: state.defaultSellPlatform,
+            }
             const { error } = await supabase
               .from('profiles')
-              .update({
-                ebay_store_type: state.ebayStoreType,
-                promoted_percent: state.promotedPercent,
-                target_roi: state.targetRoi,
-                default_weight: state.defaultWeight,
-                default_sell_platform: state.defaultSellPlatform,
-              } as never)
+              .update(profileUpdate)
               .eq('id', userId)
 
             if (error) throw error

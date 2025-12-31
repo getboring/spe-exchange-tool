@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { supabase } from '@/lib/supabase'
-import type { Item } from '@/types/database'
+import type { Item, ItemUpdate } from '@/types/database'
 import type { ItemStatus, Platform } from '@/lib/constants'
 
 interface InventoryFilters {
@@ -73,9 +73,10 @@ export const useInventoryStore = create<InventoryState>()(
       },
 
       updateItem: async (id, updates) => {
+        const itemUpdate: ItemUpdate = updates
         const { error } = await supabase
           .from('items')
-          .update(updates as never)
+          .update(itemUpdate)
           .eq('id', id)
 
         if (error) {

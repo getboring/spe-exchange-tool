@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { supabase } from '@/lib/supabase'
-import type { Deal, Item } from '@/types/database'
+import type { Deal, Item, DealInsert, DealUpdate, ItemUpdate } from '@/types/database'
 import type { DealStatus } from '@/lib/constants'
 
 interface DealWithItems extends Deal {
@@ -122,9 +122,10 @@ export const useDealsStore = create<DealsState>()(
       },
 
       createDeal: async (deal) => {
+        const dealInsert: DealInsert = deal
         const { data, error } = await supabase
           .from('deals')
-          .insert(deal as never)
+          .insert(dealInsert)
           .select()
           .single()
 
@@ -139,9 +140,10 @@ export const useDealsStore = create<DealsState>()(
       },
 
       updateDeal: async (id, updates) => {
+        const dealUpdate: DealUpdate = updates
         const { error } = await supabase
           .from('deals')
-          .update(updates as never)
+          .update(dealUpdate)
           .eq('id', id)
 
         if (error) {
@@ -159,9 +161,10 @@ export const useDealsStore = create<DealsState>()(
 
       deleteDeal: async (id) => {
         // First, unlink items from this deal
+        const unlinkUpdate: ItemUpdate = { deal_id: null }
         await supabase
           .from('items')
-          .update({ deal_id: null } as never)
+          .update(unlinkUpdate)
           .eq('deal_id', id)
 
         // Then delete the deal
